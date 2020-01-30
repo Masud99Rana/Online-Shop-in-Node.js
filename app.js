@@ -25,17 +25,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 }); 
 */
 
-/* app.get('/',(req, res)=>{
+app.get('/',(req, res)=>{
   // res.send("Hello Masud");
   // res.send("<h1>Hello Node.js</h2>");
   res.render('shop/index',{ pageTitle: 'Shop Page', path: '/' });
-}); */
+});
 
 
 // Load & Use route
 const adminRoutes = require('./routes/admin');
-// app.use('/admin', adminRoutes);
-app.use('/', adminRoutes);
+app.use('/admin', adminRoutes);
 
 //404 error handled
 /* app.use((req, res, next) => {
