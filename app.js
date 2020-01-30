@@ -4,12 +4,12 @@ const bodyParser = require('body-parser');
 const app = express();
 const sequelize = require('./util/database');
 
-
 // Controller
 const errorController = require('./controllers/error');
 
 //Model 
 const Product = require('./models/product');
+const User = require('./models/user');
 
 //Config Template Engine ejs
 app.set('view engine', 'ejs');
@@ -25,16 +25,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 }); 
 */
 
-app.get('/',(req, res)=>{
+/* app.get('/',(req, res)=>{
   // res.send("Hello Masud");
   // res.send("<h1>Hello Node.js</h2>");
-  res.render('shop/index',{ pageTitle: 'Shop Page', path: '/' });
-});
+  //res.render('shop/index',{ pageTitle: 'Shop Page', path: '/' });
+}); */
 
 
 // Load & Use route
 const adminRoutes = require('./routes/admin');
+const shopRoutes = require('./routes/shop');
 app.use('/admin', adminRoutes);
+app.use(shopRoutes);
 
 //404 error handled
 /* app.use((req, res, next) => {
