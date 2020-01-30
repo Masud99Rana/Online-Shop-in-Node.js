@@ -31,6 +31,15 @@ app.use(express.static(path.join(__dirname, 'public')));
   //res.render('shop/index',{ pageTitle: 'Shop Page', path: '/' });
 }); */
 
+// Middleware run when request come to server. it run after db. So, we get the data here...
+app.use((req, res, next) => {
+  User.findByPk(1)
+    .then(user => {
+      req.user = user;
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 // Load & Use route
 const adminRoutes = require('./routes/admin');
@@ -44,9 +53,22 @@ app.use(shopRoutes);
 }); */
 app.use(errorController.get404);
 
+Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
+User.hasMany(Product); // product table ee (userId) field auto create hobbe.
 
 sequelize
+  // .sync({ force: true })
   .sync()
+  .then(result => {
+    return User.findByPk(1);
+    // console.log(result);
+  })
+  .then(user => {
+    if (!user) {
+      return User.create({ name: 'Masud', email: 'test@test.com' });
+    }
+    return user;
+  })
   .then(result => {
     // console.log(result);
     const port = process.env.PORT || 4500;
