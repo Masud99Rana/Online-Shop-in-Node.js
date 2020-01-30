@@ -2,6 +2,14 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
+const sequelize = require('./util/database');
+
+
+// Controller
+const errorController = require('./controllers/error');
+
+//Model 
+const Product = require('./models/product');
 
 //Config Template Engine ejs
 app.set('view engine', 'ejs');
@@ -17,14 +25,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 }); 
 */
 
-// Controller
-const errorController = require('./controllers/error');
-
 /* app.get('/',(req, res)=>{
   // res.send("Hello Masud");
   // res.send("<h1>Hello Node.js</h2>");
   res.render('shop/index',{ pageTitle: 'Shop Page', path: '/' });
 }); */
+
 
 // Load & Use route
 const adminRoutes = require('./routes/admin');
@@ -37,7 +43,16 @@ app.use('/', adminRoutes);
 }); */
 app.use(errorController.get404);
 
-const port = process.env.PORT || 4500;
-app.listen(port, ()=>{
-	console.log(`Hey Masud, I am listening on port ${port}`);
-});
+
+sequelize
+  .sync()
+  .then(result => {
+    // console.log(result);
+    const port = process.env.PORT || 4500;
+    app.listen(port, ()=>{
+      console.log(`Hey Masud, I am listening on port ${port}`);
+    });
+  })
+  .catch(err => {
+    console.log(err);
+  });
