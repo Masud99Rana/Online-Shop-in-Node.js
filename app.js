@@ -10,6 +10,10 @@ const errorController = require('./controllers/error');
 //Model 
 const Product = require('./models/product');
 const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
+const Order = require('./models/order');
+const OrderItem = require('./models/order-item');
 
 //Config Template Engine ejs
 app.set('view engine', 'ejs');
@@ -53,12 +57,29 @@ app.use(shopRoutes);
 }); */
 app.use(errorController.get404);
 
+//one to many  ( => product table e (userId) auto create hobbe. )
 Product.belongsTo(User, { constraints: true, onDelete: 'CASCADE' });
-User.hasMany(Product); // product table ee (userId) field auto create hobbe.
+User.hasMany(Product);
+
+// one to one ( => Cart table userId auto create hobbe. )
+User.hasOne(Cart);
+Cart.belongsTo(User);
+
+// many to many ( => CartItem table ee cartId	productId auto create hobbe.)
+Cart.belongsToMany(Product, { through: CartItem });
+Product.belongsToMany(Cart, { through: CartItem });
+
+// one to many ( => Order table e userId thakbe )
+Order.belongsTo(User);
+User.hasMany(Order);
+
+// Many to Many ( => OrderItem table ee orderId  productId thakbe)
+Order.belongsToMany(Product, { through: OrderItem });
+
 
 sequelize
-  // .sync({ force: true })
-  .sync()
+  .sync({ force: true }) // ( drop & create )
+  // .sync()
   .then(result => {
     return User.findByPk(1);
     // console.log(result);
@@ -68,6 +89,10 @@ sequelize
       return User.create({ name: 'Masud', email: 'test@test.com' });
     }
     return user;
+  })
+  .then(user => {
+    // console.log(user);
+    return user.createCart();
   })
   .then(result => {
     // console.log(result);
