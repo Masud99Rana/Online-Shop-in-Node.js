@@ -4,6 +4,9 @@ const bodyParser = require('body-parser');
 const app = express();
 const mongoConnect = require('./util/database').mongoConnect;
 
+// Model
+const User = require('./models/user');
+
 // Controller
 const errorController = require('./controllers/error');
 
@@ -16,6 +19,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 //Middleware
+app.use((req, res, next) => {
+  User.findById('5e33999c1c9d4400008de82d') //Need to create users table & a user manually
+    .then(user => {
+      req.user = new User(user.name, user.email, user.cart, user._id);
+      next();
+    })
+    .catch(err => console.log(err));
+});
 
 // Load & Use route
 const adminRoutes = require('./routes/admin');
@@ -28,6 +39,8 @@ app.use(shopRoutes);
   res.send('Not Found!')
 }); */
 app.use(errorController.get404);
+
+
 
 mongoConnect(() => {
   console.log("I am listenig on 4500")
