@@ -14,8 +14,9 @@ const router = express.Router();
  * Product CRUD
  * admin/add-product => GET
  */
+const isAuth = require('../middleware/is-auth');
 
-router.get('/add-product', adminProdController.getAddProduct);
+router.get('/add-product',isAuth, adminProdController.getAddProduct);
 router.post('/add-product', adminProdController.postAddProduct);
 router.get('/products', adminProdController.getProducts);
 router.post('/edit-product', adminProdController.postEditProduct);
